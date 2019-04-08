@@ -21,17 +21,9 @@ typedef unsigned long uint32_t;
     ClearString(d);      \
     memcpy(d, s, strlen(s))
 #define StringAppend(d, s) strcat(d, s)
-#define ShrinkVol(vol, val) vol = (val / 100.0) * 64
-#define StretchVol(vol, val) vol = (val / 64.0) * 100
-#define SetBit(var, bit) ((var) |= (1 << (bit)))
-#define ClearBit(var, bit) ((var) &= ~(1 << (bit)))
 /*******************************************************************************
  * FUNCTIONS
  *******************************************************************************/
-uint8_t Util_LoadSettings(char *fname, uint8_t *dat);
 uint8_t ArrayLength(char *arr);
-uint8_t Util_SaveSettings(char *fname, uint8_t *dat);
-uint8_t FillNames(char Names[32][12]);
-uint8_t TestBit(uint8_t, int8_t);
 char *utoa(char *str, unsigned int value, int radix);
 #endif
