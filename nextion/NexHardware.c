@@ -101,8 +101,8 @@ uint16_t recvRetString(char *buffer, uint16_t len)
     uint16_t ret = 0;
     uint8_t str_start_flag = 0;
     uint8_t cnt_0xff = 0;
-    char arr[32];
-    char *temp = arr;
+    uint8_t arr[32];
+    uint8_t *temp = arr;
     uint8_t c = 0;
     long start;
 
@@ -129,7 +129,7 @@ uint16_t recvRetString(char *buffer, uint16_t len)
                 }
                 else
                 {
-                    temp += (char)c;
+                    *temp++ = c;
                 }
             }
             else if (NEX_RET_STRING_HEAD == c)
