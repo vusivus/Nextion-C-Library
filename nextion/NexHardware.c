@@ -54,24 +54,18 @@ uint8_t recvRetNumber(uint32_t *number)
     uint8_t ret = 0;
     char temp[8];
 
-    if (!number)
-    {
-        goto __return;
+    if (number){
+        
+        nexDelay(100);
+        if (8 == nexSerial_readBytes((char *)temp, 8)){
+            
+            if (temp[0] == NEX_RET_NUMBER_HEAD && temp[5] == 0xFF && temp[6] == 0xFF && temp[7] == 0xFF){
+                
+                *number = ((uint32_t)temp[4] << 24) | ((uint32_t)temp[3] << 16) | (temp[2] << 8) | (temp[1]);
+                ret = 1;
+            }
+        }
     }
-
-    nexDelay(100);
-    if (8 != nexSerial_readBytes((char *)temp, 8))
-    {
-        goto __return;
-    }
-
-    if (temp[0] == NEX_RET_NUMBER_HEAD && temp[5] == 0xFF && temp[6] == 0xFF && temp[7] == 0xFF)
-    {
-        *number = ((uint32_t)temp[4] << 24) | ((uint32_t)temp[3] << 16) | (temp[2] << 8) | (temp[1]);
-        ret = 1;
-    }
-
-__return:
 
     /*if (ret) 
     {
@@ -101,55 +95,46 @@ uint16_t recvRetString(char *buffer, uint16_t len)
     uint16_t ret = 0;
     uint8_t str_start_flag = 0;
     uint8_t cnt_0xff = 0;
-    char arr[32];
-    char *temp = arr;
+    uint8_t arr[32];
+    uint8_t *temp = arr;
     uint8_t c = 0;
     long start;
 
-    if (!buffer || len == 0)
-    {
-        goto __return;
-    }
-
-    start = 500;
-    while (start)
-    {
-        while (nexSerial_available())
-        {
-            c = nexSerial_read();
-            if (str_start_flag)
-            {
-                if (0xFF == c)
-                {
-                    cnt_0xff++;
-                    if (cnt_0xff >= 3)
-                    {
-                        break;
+    if (buffer && len){        
+        
+        start = 50000;
+        
+        while (start){
+            while (nexSerial_available()){
+                
+                c = nexSerial_read();
+                
+                if (str_start_flag){
+                
+                    if (0xFF == c){
+                        cnt_0xff++;
+                        if (cnt_0xff >= 3){
+                            break;
+                        }
+                    }else{
+                        *temp++ = c;
                     }
-                }
-                else
-                {
-                    temp += (char)c;
+                } else if (NEX_RET_STRING_HEAD == c){
+                    str_start_flag = 1;
                 }
             }
-            else if (NEX_RET_STRING_HEAD == c)
-            {
-                str_start_flag = 1;
+
+            if (cnt_0xff >= 3){
+                break;
             }
+            --start;
         }
 
-        if (cnt_0xff >= 3)
-        {
-            break;
-        }
-        --start;
+        ret = ArrayLength(temp);
+        ret = ret > len ? len : ret;
+        strncpy(buffer, temp, ret);
     }
 
-    ret = ArrayLength(temp);
-    ret = ret > len ? len : ret;
-    strncpy(buffer, temp, ret);
-
-__return:
     /*
     dbSerialPrint("recvRetString[");
     dbSerialPrint(temp.length());

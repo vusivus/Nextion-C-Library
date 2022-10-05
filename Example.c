@@ -13,7 +13,7 @@ long value;
 
 #define buttonPageID 0
 #define sliderPageID 0
-#define buttonID 2
+#define buttonID 1
 #define sliderID 2
 
 void main()
